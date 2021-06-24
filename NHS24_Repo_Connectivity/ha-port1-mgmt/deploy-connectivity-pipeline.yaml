@@ -1,0 +1,31 @@
+variables:
+- group: 'nhs24-conn-sub-vars'  
+
+trigger:
+ - main
+ - feature/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+  displayName: 'Terraform : INIT'
+  inputs:
+    workingDirectory: './ha-port1-mgmt' 
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'NHS24 Service Principal for Azure DevOps Connectivity Subscription Pipeline'
+    backendAzureRmResourceGroupName: 'nhs24-rg-terraform-connectivity-001'
+    backendAzureRmStorageAccountName: 'nhs24saterraconnectivity'
+    backendAzureRmContainerName: 'terraform'
+    backendAzureRmKey: 'terraform.tfstate'
+
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV2@2
+  displayName: 'Terraform : VAL & APPLY'
+  inputs:
+    workingDirectory: './ha-port1-mgmt'
+    command: apply
+    environmentServiceNameAzureRM: 'NHS24 Service Principal for Azure DevOps Connectivity Subscription Pipeline'
